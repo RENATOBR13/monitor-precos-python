@@ -2,9 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 
 def buscar_preco_produto(url: str) -> float | None:
-    """Faz a requisição na página web e extrai o preço atual."""
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
     
     try:
@@ -13,18 +12,18 @@ def buscar_preco_produto(url: str) -> float | None:
         
         soup = BeautifulSoup(resposta.text, 'html.parser')
         
-        # Ajuste a tag e a classe conforme o site que você for monitorar
-        elemento_preco = soup.find("span", class_="preco-atual")
+        # No site de teste Books to Scrape, o preço fica dentro de uma tag p com a classe 'price_color'
+        elemento_preco = soup.find("p", class_="price_color")
         
         if not elemento_preco:
+            print("⚠️ Tag de preço não encontrada na página.")
             return None
         
-        # Tratamento da string para converter em float
+        # O texto vem no formato '£51.77'. Vamos limpar e converter para float.
         preco_texto = (
             elemento_preco.get_text()
-            .replace("R$", "")
-            .replace(".", "")
-            .replace(",", ".")
+            .replace("£", "")
+            .replace("Â", "")  # Caractere especial de encoding comum em libras esterlinas
             .strip()
         )
         return float(preco_texto)

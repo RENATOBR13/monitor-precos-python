@@ -1,0 +1,35 @@
+name: Monitor de Preços Automático
+
+# Define quando o robô deve rodar
+on:
+  schedule:
+    # Roda a cada 6 horas (formato Cron UTC)
+    - cron: '0 */6 * * *'
+  
+  # Permite que você também execute o script manualmente clicando num botão no GitHub
+  workflow_dispatch:
+
+jobs:
+  executar-monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Baixa o código do seu repositório para o servidor do GitHub
+      - name: Checkout do Repositório
+        uses: actions/checkout@v3
+
+      # 2. Configura o ambiente Python na versão mais recente
+      - name: Configurar o Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 3. Instala as dependências necessárias (requests e beautifulsoup4)
+      - name: Instalar Dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4
+
+      # 4. Executa o seu script principal
+      - name: Rodar Script de Preços
+        run: python main.py
