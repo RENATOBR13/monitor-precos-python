@@ -7,7 +7,7 @@ try:
 except ImportError:
     PYWHATKIT_DISPONIVEL = False
 
-TELEFONE_PADRAO = "+5511999999999"
+TELEFONE_PADRAO = "+5511982647732"
 
 def disparar_alerta(preco_atual: float, preco_limite: float, telefone_destino: str = TELEFONE_PADRAO):
     """

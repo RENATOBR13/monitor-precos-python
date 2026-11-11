@@ -1,26 +1,51 @@
+import json
+import os
 from src.scraper import buscar_preco_produto
 from src.database import salvar_historico
 from src.notifier import disparar_alerta
 
-# URL de um livro de teste no site Books to Scrape
-URL_ALVO = "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
-PRECO_LIMITE = 60.00  # Como o livro custa cerca de 51.77, o alerta vai disparar avisando que está abaixo da meta!
+CAMINHO_JSON = "produtos.json"
+
+def carregar_produtos():
+    """Carrega a lista de produtos do arquivo JSON de forma segura."""
+    if not os.path.exists(CAMINHO_JSON):
+        print(f"❌ Arquivo {CAMINHO_JSON} não encontrado!")
+        return []
+        
+    with open(CAMINHO_JSON, "r", encoding="utf-8-sig") as f:
+        return json.load(f)
 
 def main():
-    print("Iniciando varredura do produto de teste...")
+    print("Iniciando varredura da lista de produtos...\n")
     
-    preco_atual = buscar_preco_produto(URL_ALVO)
+    produtos = carregar_produtos()
     
-    if preco_atual is not None:
-        print(f"Preço capturado com sucesso: R$ {preco_atual}")
-        salvar_historico(preco_atual)
+    if not produtos:
+        print("Nenhum produto cadastrado para monitorar.")
+        return
+
+    # Loop para passar por cada produto da lista
+    for item in produtos:
+        nome = item["nome"]
+        url = item["url"]
+        preco_limite = item["preco_limite"]
         
-        # Se quiser testar o WhatsApp real, substitua pelo seu número. 
-        # Se quiser testar só o console por enquanto, a função anterior de console serve perfeitamente.
-        MEU_TELEFONE = "+5511982647732"  # Coloque seu número real com DDD
-        disparar_alerta(preco_atual, PRECO_LIMITE)
-    else:
-        print("Falha ao capturar o preço nesta execução.")
+        print(f"🔍 Verificando: {nome}...")
+        
+        preco_atual = buscar_preco_produto(url)
+        
+        if preco_atual is not None:
+            print(f"   -> Preço atual: R$ {preco_atual} (Meta: R$ {preco_limite})")
+            
+            # Salva no histórico (se quiser separar por produto no CSV depois, podemos evoluir)
+            salvar_historico(preco_atual)
+            
+            # Dispara o alerta se atingiu a meta
+            disparar_alerta(preco_atual, preco_limite)
+        else:
+            print(f"   -> ⚠️ Falha ao capturar o preço para este produto.")
+            
+        print("-" * 40)
 
 if __name__ == "__main__":
     main()

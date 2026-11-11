@@ -1,0 +1,12 @@
+﻿[
+  {
+    "nome": "Livro de Teste - A Light in the Attic",
+    "url": "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html",
+    "preco_limite": 60.00
+  },
+  {
+    "nome": "Segundo Livro de Teste - Sharp Objects",
+    "url": "https://books.toscrape.com/catalogue/sharp-objects_612/index.html",
+    "preco_limite": 55.00
+  }
+]
