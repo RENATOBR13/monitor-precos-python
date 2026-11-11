@@ -1,20 +1,24 @@
-import pywhatkit as kit
 from datetime import datetime
 
-# Você pode definir um número padrão aqui para facilitar
-TELEFONE_PADRAO = "+5511982647732"  # Substitua pelo seu DDD e número real
+# Tenta importar o pywhatkit de forma segura (caso não esteja instalado, o script não quebra)
+try:
+    import pywhatkit as kit
+    PYWHATKIT_DISPONIVEL = True
+except ImportError:
+    PYWHATKIT_DISPONIVEL = False
+
+TELEFONE_PADRAO = "+5511999999999"
 
 def disparar_alerta(preco_atual: float, preco_limite: float, telefone_destino: str = TELEFONE_PADRAO):
     """
     Verifica se o preço atingiu a meta e dispara o alerta no console 
-    e opcionalmente no WhatsApp.
+    e opcionalmente no WhatsApp (se a biblioteca estiver disponível).
     """
     if preco_atual <= preco_limite:
         mensagem = f"🚨 ALERTA DE PREÇO! O produto baixou para R$ {preco_atual} (Sua meta era R$ {preco_limite})."
         print(mensagem)
         
-        # Se um telefone de destino foi informado, tenta enviar o WhatsApp
-        if telefone_destino:
+        if telefone_destino and PYWHATKIT_DISPONIVEL:
             try:
                 agora = datetime.now()
                 hora = agora.hour
@@ -30,5 +34,7 @@ def disparar_alerta(preco_atual: float, preco_limite: float, telefone_destino: s
                 
             except Exception as e:
                 print(f"Erro ao tentar enviar o WhatsApp: {e}")
+        else:
+            print("ℹ️ Alerta registrado no console (Envio de WhatsApp desativado neste ambiente).")
     else:
         print(f"ℹ️ Preço atual (R$ {preco_atual}) ainda está acima do limite (R$ {preco_limite}).")
